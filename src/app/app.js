@@ -1,40 +1,34 @@
-const movie = {
-    id: null,
-    title: null,
-    genre: [null],
-    indicativeClassification: null,
-    durationMinutes: null,
-    criticalNote: null,
-    launchDate: null,
+const movie = [{
+    id: 0,
+    title: "CasamentoSangrento",
+    genre: ["romance", "aventura", "terror", "acao"],
+    indicativeClassification: 16,
+    durationMinutes: 30,
+    criticalNote: 7,
+    launchDate: 2020,
+}]
+
+const user = [{
+    id: 0,
+    nickname: "felip",
+    age: 18,
+    favoriteGenreList: ["acao", "terror", "comedia"],
+    freeTimeMinutes: 60,
+    idListWatchedMovies: [4,6,3,8,1,0],
+}] // Antes de fazer a busca, envio o array para ordenacao
+
+function hardFilter(user, movie) {
+    console.log(arrayOrganized)
+    if (user[0].age > movie[0].indicativeClassification){
+        if (user[0].freeTimeMinutes > movie[0].durationMinutes){
+            if(binarySearch(arrayOrganized, movie[0].id) !== -1){
+                return true
+            } else {return false}
+        } else {return false}
+    } else {return false}
 }
 
-const user = {
-    id: null,
-    nickname: null,
-    age: null,
-    favoriteGenreList: [null],
-    freeTimeMinutes: null,
-    idListWatchedMovies: [null],
-}
-
-function hardFilter(movie, user) {
-    if (user.age < movie.indicativeClassification) {
-        return false;
-    }
-    
-    if (user.freeTimeMinutes < movie.durationMinutes){
-        return false
-    }
-    
-    if(binarySearch(arrayOrganized, movie.id) !== -1 || binarySearch(user.idListWatchedMovies, movie.id) >=0){
-        return false
-    } else {
-        return true
-    }
-    
-}
-
-function mergeSort(array){
+function mergeSort(array, func){
     if (array.length <=1){
         return array
     }
@@ -43,8 +37,8 @@ function mergeSort(array){
 
     const left = array.slice(0, mid)
     const right = array.slice(mid)
-
-    return merge(mergeSort(left), mergeSort(right))
+    
+    return func(mergeSort(left), mergeSort(right))
 }
 
 function merge(left, right){
@@ -52,7 +46,7 @@ function merge(left, right){
     let indexLeft = 0
     let indexRight = 0
 
-    while (indexLeft < left.length && indexRight) {
+    while (indexLeft < left.length && indexRight < right.length) {
         if (left[indexLeft] < right[indexRight]){
             result.push(left[indexLeft])
             indexLeft++
@@ -64,7 +58,24 @@ function merge(left, right){
     return result.concat(left.slice(indexLeft).concat(right.slice(indexRight)))
 }
 
-let arrayOrganized = mergeSort(user.idListWatchedMovies)     // Antes de fazer a busca, envio o array para ordenacao
+let arrayOrganized = mergeSort(user[0].idListWatchedMovies, merge)
+
+function inverseMerge(left, right){
+    let result = []
+    let indexLeft = 0
+    let indexRight = 0
+
+    while (indexLeft < left.length && indexRight < right.length) {
+        if (left[indexLeft] > right[indexRight]){
+            result.push(left[indexLeft])
+            indexLeft++
+        } else {
+            result.push(right[indexRight])
+            indexRight++
+        }
+    }
+    return result.concat(left.slice(indexLeft).concat(right.slice(indexRight)))
+}
 
 function binarySearch(array, target){
 
@@ -84,7 +95,81 @@ function binarySearch(array, target){
             tail = mid - 1
         }
     }
+    console.log(" a Não achei")
     return -1
 }
 
-export default app;
+function compareArrayItens(arrayA, arrayB){
+    return arrayA.filter((item) => {return arrayB.includes(item)})    
+}
+
+const identicGenderArray = compareArrayItens(user[0].favoriteGenreList, movie[0].genre)
+
+function calculateMatchScore(){
+    genderAfinity()
+    qualityCriticalNote()
+    bonusRecentLauch()
+
+}
+
+function genderAfinity(){
+    if (identicGenderArray.length === 1){
+        movie[0].matchScore += 30
+    } else if (identicGenderArray.length >= 2){
+        movie[0].matchScore += 50
+    } else {
+        movie[0].matchScore += 0 
+    }
+}
+
+function qualityCriticalNote(){
+    movie[0].matchScore += (movie[0].criticalNote * 3)
+}
+
+function bonusRecentLauch(){
+    const actualYear = new Date().getFullYear()
+    const timeInteval = actualYear - movie[0].launchDate
+
+    if (timeInteval <= 2){
+        movie[0].matchScore += 20
+    } else if (timeInteval >= 3 && timeInteval <= 5) {
+        movie[0].matchScore += 10
+    } else {
+        movie[0].matchScore += 0
+    }
+}
+
+function classificationRanking(){
+    if(!(movie[0].matchScore >= 40)) return
+
+    const listRanking = []
+    
+    
+}
+
+
+function main(){
+    if(hardFilter(user, movie)){
+        movie[0].matchScore = 0 
+    }
+    calculateMatchScore()
+    console.log("Array Identico:", identicGenderArray)
+}
+
+main()
+
+
+
+export default {
+    movie,
+    user,
+    hardFilter,
+    mergeSort,
+    binarySearch,
+    compareArrayItens,
+    calculateMatchScore,
+    genderAfinity,
+    qualityCriticalNote,
+    bonusRecentLauch,
+    main
+};
