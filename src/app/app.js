@@ -38,7 +38,7 @@ function mergeSort(array, func){
     const left = array.slice(0, mid)
     const right = array.slice(mid)
     
-    return func(mergeSort(left), mergeSort(right))
+    return func(mergeSort(left, func), mergeSort(right, func))
 }
 
 function merge(left, right){
